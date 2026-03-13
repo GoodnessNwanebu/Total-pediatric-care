@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { Phone, MapPin, Clock, Heart, ArrowRight, MessageCircle, ShieldCheck, Calendar, Star, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Phone, MapPin, Clock, Heart, ArrowRight, MessageCircle, ShieldCheck, Calendar, Star } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 const team = [
@@ -59,25 +59,14 @@ function MobileTeamCarousel() {
   const [current, setCurrent] = React.useState(0);
   const [direction, setDirection] = React.useState(1);
 
-  const prev = () => { setDirection(-1); setCurrent(i => Math.max(0, i - 1)); };
-  const next = () => { setDirection(1); setCurrent(i => Math.min(team.length - 1, i + 1)); };
+  const prev = () => { setDirection(-1); setCurrent(i => (i - 1 + team.length) % team.length); };
+  const next = () => { setDirection(1); setCurrent(i => (i + 1) % team.length); };
 
   const member = team[current];
   const isFounder = current === 0;
 
   return (
     <div className="lg:hidden">
-
-      {/* Segmented progress bar */}
-      <div className="flex gap-1.5 mb-6">
-        {team.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => { setDirection(i > current ? 1 : -1); setCurrent(i); }}
-            className={`h-1 flex-1 rounded-full transition-all duration-300 ${i === current ? 'bg-forest' : 'bg-forest/15'}`}
-          />
-        ))}
-      </div>
 
       {/* Card */}
       <div className="overflow-hidden">
@@ -116,15 +105,15 @@ function MobileTeamCarousel() {
         </AnimatePresence>
       </div>
 
-      {/* Navigation */}
-      <div className="flex justify-between items-center mt-5">
-        <button onClick={prev} disabled={current === 0} className="p-3 rounded-full border border-forest/10 disabled:opacity-25 transition-opacity">
-          <ChevronLeft size={18} className="text-forest" />
-        </button>
-        <span className="text-sm text-forest/40 font-medium">{current + 1} / {team.length}</span>
-        <button onClick={next} disabled={current === team.length - 1} className="p-3 rounded-full border border-forest/10 disabled:opacity-25 transition-opacity">
-          <ChevronRight size={18} className="text-forest" />
-        </button>
+      {/* Dot indicators */}
+      <div className="flex justify-center items-center gap-2 mt-5">
+        {team.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => { setDirection(i > current ? 1 : -1); setCurrent(i); }}
+            className={`h-2 rounded-full transition-all duration-300 ${i === current ? 'w-6 bg-forest' : 'w-2 bg-forest/20'}`}
+          />
+        ))}
       </div>
 
     </div>

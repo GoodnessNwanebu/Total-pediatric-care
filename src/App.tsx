@@ -4,36 +4,158 @@
  */
 
 import React from 'react';
-import { Phone, MapPin, Clock, Heart, ArrowRight, MessageCircle, ShieldCheck, Users, Activity, Calendar, Star } from 'lucide-react';
-import { motion } from 'motion/react';
+import { Phone, MapPin, Clock, Heart, ArrowRight, MessageCircle, ShieldCheck, Calendar, Star, ChevronLeft, ChevronRight } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+
+const team = [
+  {
+    name: "Dr. Karl Yousef",
+    role: "Founder & Pediatrician",
+    bio: "ER-trained and trilingual in English, Spanish, and Arabic — Dr. Yousef founded Total Pediatric Care to make expert care accessible to every family in South Florida.",
+    image: "/Bio-Karl-TPC-logo-2.jpg"
+  },
+  {
+    name: "Dr. Diah",
+    role: "Pediatrician",
+    bio: "Board-certified with specialized fellowship training in child abuse pediatrics — a steadfast advocate for every child's safety and wellbeing.",
+    image: "/Dr.-Diah-Headshot-with-CAS-Logo-and-Slogan-1.png"
+  },
+  {
+    name: "Dr. Steinberg",
+    role: "Pediatrician",
+    bio: "An emergency medicine background meets a mother's instinct. She's seen it all and knows exactly how to put both kids and parents at ease.",
+    image: "/Dr.-Steinberg-Headshot-with-CAS-Logo-and-Slogan-1.png"
+  },
+  {
+    name: "Dr. Sheikh",
+    role: "Pediatrician",
+    bio: "Board-certified and a certified lactation consultant — she supports families from the very first feed through every stage of childhood.",
+    image: "/Dr.-Sheikh-Headshot-with-white-coat.jpg"
+  },
+  {
+    name: "Charmaine Limpioso",
+    role: "APRN",
+    bio: "Charmaine brings warmth, clinical expertise, and bilingual care to every family that walks through the door.",
+    image: "/Charmaine.jpg"
+  }
+];
+
+const reviews = [
+  {
+    quote: "My kids have been patients here for 10+ years. I wouldn't choose any other pediatrician.",
+    author: "Toni Golden"
+  },
+  {
+    quote: "Every doctor gives their patient plenty of time to talk and discuss what's happening with their child.",
+    author: "Matthew Thompson"
+  },
+  {
+    quote: "The doctor was very thoughtful, listened to our concerns and felt genuinely invested in guiding us.",
+    author: "Joseph Blackburn"
+  }
+];
+
+function MobileTeamCarousel() {
+  const [current, setCurrent] = React.useState(0);
+  const [direction, setDirection] = React.useState(1);
+
+  const prev = () => { setDirection(-1); setCurrent(i => Math.max(0, i - 1)); };
+  const next = () => { setDirection(1); setCurrent(i => Math.min(team.length - 1, i + 1)); };
+
+  const member = team[current];
+  const isFounder = current === 0;
+
+  return (
+    <div className="lg:hidden">
+
+      {/* Segmented progress bar */}
+      <div className="flex gap-1.5 mb-6">
+        {team.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => { setDirection(i > current ? 1 : -1); setCurrent(i); }}
+            className={`h-1 flex-1 rounded-full transition-all duration-300 ${i === current ? 'bg-forest' : 'bg-forest/15'}`}
+          />
+        ))}
+      </div>
+
+      {/* Card */}
+      <div className="overflow-hidden">
+        <AnimatePresence mode="wait" custom={direction}>
+          <motion.div
+            key={current}
+            custom={direction}
+            variants={{
+              enter: (dir: number) => ({ x: dir > 0 ? 60 : -60, opacity: 0 }),
+              center: { x: 0, opacity: 1 },
+              exit: (dir: number) => ({ x: dir > 0 ? -60 : 60, opacity: 0 }),
+            }}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ duration: 0.25, ease: 'easeInOut' }}
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.15}
+            onDragEnd={(_, info) => {
+              if (info.offset.x < -40) next();
+              if (info.offset.x > 40) prev();
+            }}
+            className={`rounded-3xl overflow-hidden cursor-grab active:cursor-grabbing ${isFounder ? 'bg-forest' : 'bg-cream border border-forest/8'}`}
+          >
+            <div className="aspect-[4/3] w-full overflow-hidden bg-sand">
+              <img src={member.image} alt={member.name} className="w-full h-full object-cover object-top" />
+            </div>
+            <div className="p-6">
+              {isFounder && <span className="text-xs font-medium uppercase tracking-widest text-cream/50 block mb-2">Founder</span>}
+              <p className={`font-serif font-semibold text-xl leading-tight ${isFounder ? 'text-cream' : 'text-forest'}`}>{member.name}</p>
+              <p className={`text-xs font-medium uppercase tracking-widest mt-1 mb-3 ${isFounder ? 'text-cream/50' : 'text-forest/50'}`}>{member.role}</p>
+              <p className={`text-sm leading-relaxed ${isFounder ? 'text-cream/80' : 'text-forest/70'}`}>{member.bio}</p>
+            </div>
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      {/* Navigation */}
+      <div className="flex justify-between items-center mt-5">
+        <button onClick={prev} disabled={current === 0} className="p-3 rounded-full border border-forest/10 disabled:opacity-25 transition-opacity">
+          <ChevronLeft size={18} className="text-forest" />
+        </button>
+        <span className="text-sm text-forest/40 font-medium">{current + 1} / {team.length}</span>
+        <button onClick={next} disabled={current === team.length - 1} className="p-3 rounded-full border border-forest/10 disabled:opacity-25 transition-opacity">
+          <ChevronRight size={18} className="text-forest" />
+        </button>
+      </div>
+
+    </div>
+  );
+}
 
 export default function App() {
   return (
     <div className="min-h-screen flex flex-col selection:bg-forest selection:text-cream bg-cream">
-      {/* 
-        STICKY HEADER - "Zero Friction" Contact
-      */}
+
+      {/* STICKY HEADER */}
       <div className="sticky top-0 z-50 bg-cream/80 backdrop-blur-xl border-b border-forest/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row justify-between items-center py-4 gap-4">
             <div className="flex flex-col items-center sm:items-start">
               <span className="font-serif text-2xl font-semibold tracking-tight text-forest">Total Pediatric Care</span>
             </div>
-            
             <div className="flex items-center gap-3">
-              <a 
-                href="sms:+19545550198" 
+              <a
+                href="sms:+19543510202"
                 className="hidden sm:flex items-center gap-2 text-forest font-medium px-5 py-2.5 rounded-full hover:bg-forest/5 transition-colors"
               >
                 <MessageCircle size={18} />
                 <span>Text Us</span>
               </a>
-              <a 
-                href="tel:+19545550198" 
+              <a
+                href="tel:+19543510202"
                 className="group flex items-center gap-3 bg-forest text-cream px-6 py-3 rounded-full hover:bg-forest-light transition-all shadow-sm hover:shadow-md"
               >
                 <Phone size={18} className="fill-current group-hover:scale-110 transition-transform" />
-                <span className="font-medium tracking-wide">(954) 555-0198</span>
+                <span className="font-medium tracking-wide">(954) 351-0202</span>
               </a>
             </div>
           </div>
@@ -41,12 +163,12 @@ export default function App() {
       </div>
 
       <main className="flex-grow">
-        {/* FIGMA-STYLE HERO - Centered, Massive, Organic */}
+
+        {/* HERO */}
         <section className="pt-16 pb-20 sm:pt-24 sm:pb-32 px-4 overflow-hidden">
           <div className="max-w-5xl mx-auto flex flex-col items-center text-center relative z-10">
-            
-            {/* NBC Pill - Equal padding all around */}
-            <motion.div 
+
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
@@ -54,8 +176,8 @@ export default function App() {
             >
               Featured on NBC 6 for protecting children's healthcare
             </motion.div>
-            
-            <motion.h1 
+
+            <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
@@ -63,8 +185,8 @@ export default function App() {
             >
               Pediatric care that treats you like <span className="italic text-forest-light">family.</span>
             </motion.h1>
-            
-            <motion.p 
+
+            <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
@@ -74,7 +196,7 @@ export default function App() {
             </motion.p>
 
             {/* TrustIndex Reviews Badge */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.25 }}
@@ -89,34 +211,34 @@ export default function App() {
               </div>
               <span className="text-forest font-semibold ml-1">4.9/5</span>
               <span className="text-forest/40 mx-1 hidden sm:inline">•</span>
-              <a 
-                href="https://www.trustindex.io/reviews/mytotalpediatriccare.com" 
-                target="_blank" 
-                rel="noreferrer" 
+              <a
+                href="https://www.trustindex.io/reviews/mytotalpediatriccare.com"
+                target="_blank"
+                rel="noreferrer"
                 className="text-forest/80 hover:text-forest transition-colors font-medium text-sm sm:text-base underline underline-offset-4 decoration-forest/20 hover:decoration-forest/50"
               >
                 Trusted by 538+ families
               </a>
             </motion.div>
 
-            {/* Massive Image with Refined UI Pills */}
-            <motion.div 
+            {/* Hero Image with Pills */}
+            <motion.div
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
               className="relative w-full max-w-4xl mx-auto"
             >
               <div className="aspect-[16/10] sm:aspect-[21/9] rounded-[2.5rem] sm:rounded-[4rem] overflow-hidden shadow-2xl shadow-forest/10 relative">
-                <img 
-                  src="https://images.unsplash.com/photo-1584515933487-779824d29309?q=80&w=2000&auto=format&fit=crop" 
-                  alt="Pediatrician comforting a child" 
+                <img
+                  src="https://images.unsplash.com/photo-1584515933487-779824d29309?q=80&w=2000&auto=format&fit=crop"
+                  alt="Pediatrician comforting a child"
                   className="w-full h-full object-cover"
                   referrerPolicy="no-referrer"
                 />
                 <div className="absolute inset-0 bg-forest/10 mix-blend-multiply"></div>
               </div>
 
-              {/* Refined Pill 1 - Bottom Left */}
+              {/* Pill 1 - Bottom Left */}
               <div className="absolute bottom-4 sm:bottom-12 -left-2 sm:-left-8 bg-white/95 backdrop-blur-md px-3 py-2 sm:px-6 sm:py-4 rounded-xl sm:rounded-2xl shadow-xl flex items-center gap-2 sm:gap-3 border border-forest/5">
                 <div className="bg-sage/50 p-1.5 sm:p-2 rounded-full">
                   <Clock className="w-3.5 h-3.5 sm:w-[18px] sm:h-[18px] text-forest" />
@@ -124,29 +246,28 @@ export default function App() {
                 <span className="font-medium text-forest tracking-tight text-xs sm:text-base">Walk-ins Welcome</span>
               </div>
 
-              {/* Refined Pill 2 - Top Right */}
+              {/* Pill 2 - Top Right */}
               <div className="absolute top-4 sm:top-12 -right-2 sm:-right-8 bg-forest/95 backdrop-blur-md text-cream px-3 py-2 sm:px-6 sm:py-4 rounded-xl sm:rounded-2xl shadow-xl flex items-center gap-2 sm:gap-3 border border-forest-light/20">
                 <div className="bg-cream/20 p-1.5 sm:p-2 rounded-full">
                   <ShieldCheck className="w-3.5 h-3.5 sm:w-[18px] sm:h-[18px] text-cream" />
                 </div>
-                <span className="font-medium tracking-tight text-xs sm:text-base">Medicaid Accepted</span>
+                <span className="font-medium tracking-tight text-xs sm:text-base">Most Insurances Accepted</span>
               </div>
             </motion.div>
 
           </div>
         </section>
 
-        {/* ORGANIC BENTO BOX - Services & Info */}
+        {/* BENTO GRID */}
         <section className="pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 auto-rows-[minmax(300px,auto)]">
-            
-            {/* Bento 1: Behavioral Health (Large, Dark) */}
+
+            {/* Bento 1: Behavioral Health */}
             <div className="md:col-span-7 bg-forest text-cream rounded-[2.5rem] sm:rounded-[3rem] p-8 sm:p-12 lg:p-14 flex flex-col justify-between relative overflow-hidden group">
               <div className="absolute top-0 right-0 w-96 h-96 bg-forest-light/20 rounded-full blur-3xl -mr-20 -mt-20 transition-transform duration-700 group-hover:scale-110"></div>
-              
               <div className="relative z-10">
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-cream/10 text-cream text-xs sm:text-sm font-medium mb-6 sm:mb-8 backdrop-blur-md">
-                  <Activity size={16} />
+                  <Heart size={16} />
                   Comprehensive Care
                 </div>
                 <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif mb-4 sm:mb-6 leading-[1.1] max-w-xl">
@@ -156,20 +277,16 @@ export default function App() {
                   Unlike many clinics that only handle physical checkups, we offer dedicated support for ADHD, autism, anxiety, and complete mental well-being.
                 </p>
               </div>
-              
               <div className="relative z-10">
-                <a href="tel:+19545550198" className="inline-flex items-center gap-2 bg-cream text-forest px-5 py-3 sm:px-6 sm:py-3.5 rounded-full text-sm sm:text-base font-medium hover:bg-sage transition-colors w-fit">
+                <a href="tel:+19543510202" className="inline-flex items-center gap-2 bg-cream text-forest px-5 py-3 sm:px-6 sm:py-3.5 rounded-full text-sm sm:text-base font-medium hover:bg-sage transition-colors w-fit">
                   Discuss your child's needs <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
                 </a>
               </div>
             </div>
 
-            {/* Bento 2: Everyday Care (Light) */}
-            <div className="md:col-span-5 bg-white border border-forest/5 shadow-sm rounded-[2.5rem] sm:rounded-[3rem] p-8 sm:p-12 flex flex-col justify-between hover:shadow-md transition-shadow">
+            {/* Bento 2: Everyday Care */}
+            <div className="md:col-span-5 bg-white border border-forest/5 shadow-sm rounded-[2.5rem] sm:rounded-[3rem] p-7 sm:p-9 flex flex-col justify-between hover:shadow-md transition-shadow">
               <div>
-                <div className="w-12 h-12 bg-sand rounded-2xl flex items-center justify-center mb-6">
-                  <Heart size={24} className="text-forest" />
-                </div>
                 <h3 className="text-2xl font-serif font-medium mb-4 text-forest">Everyday Care</h3>
                 <p className="text-base sm:text-lg opacity-70 leading-relaxed">
                   From the fevers that won't break to the school physicals you need by tomorrow morning, we're here.
@@ -181,20 +298,25 @@ export default function App() {
               </ul>
             </div>
 
-            {/* Bento 3: Newborn Support (Soft Green) */}
-            <div className="md:col-span-5 bg-sage/40 rounded-[2.5rem] sm:rounded-[3rem] p-8 sm:p-12 flex flex-col justify-between">
+            {/* Bento 3: Newborn Support */}
+            <div className="md:col-span-5 bg-sage/40 rounded-[2.5rem] sm:rounded-[3rem] p-7 sm:p-9 flex flex-col justify-between">
               <div>
                 <h3 className="text-2xl font-serif font-medium mb-4 text-forest">Newborn Support</h3>
                 <p className="text-base sm:text-lg opacity-80 leading-relaxed text-forest/90">
                   Guiding new parents through the crucial first months with expert advice, milestone tracking, and gentle care.
                 </p>
               </div>
+              <ul className="mt-8 space-y-3">
+                <li className="flex items-center gap-2 text-sm sm:text-base font-medium text-forest"><div className="w-1.5 h-1.5 rounded-full bg-forest-light"></div> Newborn Visits</li>
+                <li className="flex items-center gap-2 text-sm sm:text-base font-medium text-forest"><div className="w-1.5 h-1.5 rounded-full bg-forest-light"></div> Feeding Support</li>
+                <li className="flex items-center gap-2 text-sm sm:text-base font-medium text-forest"><div className="w-1.5 h-1.5 rounded-full bg-forest-light"></div> Growth & Milestone Tracking</li>
+              </ul>
             </div>
 
-            {/* Bento 4: Location & Hours (Wide, Informational) */}
-            <div className="md:col-span-7 bg-sand rounded-[2.5rem] sm:rounded-[3rem] p-10 sm:p-16 lg:p-20 flex flex-col justify-center">
+            {/* Bento 4: Location, Hours & Languages */}
+            <div className="md:col-span-7 bg-sand rounded-[2.5rem] sm:rounded-[3rem] p-10 sm:p-16 lg:p-20 flex flex-col justify-center gap-10">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-12 lg:gap-16">
-                
+
                 {/* Location */}
                 <div>
                   <div className="flex items-center gap-3 mb-6">
@@ -204,7 +326,7 @@ export default function App() {
                     <h3 className="text-xl font-serif font-medium text-forest">Our Clinic</h3>
                   </div>
                   <p className="text-base sm:text-lg font-medium text-forest leading-relaxed">
-                    100 E. Commercial Blvd.<br/>
+                    100 E. Commercial Blvd.<br />
                     Oakland Park, FL 33334
                   </p>
                 </div>
@@ -221,13 +343,13 @@ export default function App() {
                     <li className="flex justify-between items-start border-b border-forest/10 pb-3">
                       <span className="font-medium">Mon - Fri</span>
                       <div className="text-right">
-                        <span>8:30 AM - 5:30 PM</span>
-                        <span className="block text-xs sm:text-sm opacity-70 mt-1">(Lunch: 1:00 PM - 2:00 PM)</span>
+                        <span>8:30 AM – 5:30 PM</span>
+                        <span className="block text-xs sm:text-sm opacity-70 mt-1">(Lunch: 1:00 – 2:00 PM)</span>
                       </div>
                     </li>
                     <li className="flex justify-between items-center border-b border-forest/10 pb-3">
                       <span className="font-medium">Saturday</span>
-                      <span>8:30 AM - 12:30 PM</span>
+                      <span>8:30 AM – 12:30 PM</span>
                     </li>
                     <li className="flex justify-between items-center opacity-50">
                       <span className="font-medium">Sunday</span>
@@ -237,58 +359,124 @@ export default function App() {
                 </div>
 
               </div>
+
+              {/* Languages */}
+              <div className="border-t border-forest/10 pt-8 flex flex-col sm:flex-row sm:items-center gap-4">
+                <span className="text-xs font-medium uppercase tracking-widest text-forest/50 shrink-0">We speak</span>
+                <div className="flex flex-wrap gap-2">
+                  {["English", "Español", "العربية", "Kreyòl"].map((lang) => (
+                    <span key={lang} className="px-3 py-1.5 bg-white/70 text-forest rounded-full text-sm font-medium border border-forest/10">
+                      {lang}
+                    </span>
+                  ))}
+                </div>
+              </div>
             </div>
 
           </div>
         </section>
 
-        {/* MULTIPLAYER TEAM SECTION */}
-        <section className="py-24 bg-white border-y border-forest/5 overflow-hidden">
-          <div className="max-w-7xl mx-auto px-4 text-center">
-            <h2 className="text-4xl sm:text-5xl font-serif mb-16 text-forest">Meet the Team</h2>
-            
-            {/* Overlapping Avatars (Figma Multiplayer Style) */}
-            <div className="flex justify-center items-center mb-12 px-4">
-              {[
-                "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=400&auto=format&fit=crop", // Placeholder 1
-                "https://images.unsplash.com/photo-1594824436998-058a231d6856?q=80&w=400&auto=format&fit=crop", // Placeholder 2
-                "https://images.unsplash.com/photo-1622253692010-333f2da6031d?q=80&w=400&auto=format&fit=crop", // Placeholder 3 (Center)
-                "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?q=80&w=400&auto=format&fit=crop", // Placeholder 4
-                "https://images.unsplash.com/photo-1614608682850-e0d6ed316d47?q=80&w=400&auto=format&fit=crop", // Placeholder 5
-              ].map((img, i) => (
-                <motion.div 
-                  key={i}
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5, delay: i * 0.1 }}
-                  viewport={{ once: true }}
-                  className={`relative rounded-full border-4 sm:border-8 border-white shadow-xl overflow-hidden bg-sand
-                    ${i === 2 ? 'w-32 h-32 sm:w-48 sm:h-48 z-30 scale-110' : 'w-24 h-24 sm:w-32 sm:h-32'} 
-                    ${i !== 0 ? '-ml-6 sm:-ml-10' : ''}
-                    ${i === 1 || i === 3 ? 'z-20' : ''}
-                    ${i === 0 || i === 4 ? 'z-10 opacity-90' : ''}
-                  `}
-                >
-                  <img src={img} alt="Team member" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-                </motion.div>
-              ))}
+        {/* REVIEWS */}
+        <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl sm:text-5xl font-serif text-forest mb-4">What families say</h2>
+            <a
+              href="https://www.trustindex.io/reviews/mytotalpediatriccare.com"
+              target="_blank"
+              rel="noreferrer"
+              className="text-forest/60 hover:text-forest transition-colors text-sm font-medium underline underline-offset-4 decoration-forest/20"
+            >
+              538 reviews · 4.9/5 on TrustIndex
+            </a>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {reviews.map((review, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+                viewport={{ once: true }}
+                className="bg-white border border-forest/8 rounded-[2rem] p-8 sm:p-10 flex flex-col justify-between"
+              >
+                <p className="font-serif text-xl sm:text-2xl text-forest leading-relaxed mb-8">
+                  "{review.quote}"
+                </p>
+                <p className="text-sm font-medium text-forest/50 uppercase tracking-widest">— {review.author}</p>
+              </motion.div>
+            ))}
+          </div>
+        </section>
+
+        {/* TEAM */}
+        <section className="py-24 bg-white border-y border-forest/5">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl sm:text-5xl font-serif mb-4 text-forest">Meet the Team</h2>
+              <p className="text-lg opacity-70 max-w-xl mx-auto font-light text-forest">
+                Deeply committed to the health, happiness, and future of South Florida's children.
+              </p>
             </div>
 
-            <p className="text-xl sm:text-2xl opacity-80 max-w-3xl mx-auto leading-relaxed font-light text-forest">
-              Led by <span className="font-medium">Dr. Karl Yousef</span>, our team is deeply committed to the health, happiness, and future of South Florida's children.
-            </p>
-            
-            <div className="mt-10 flex flex-wrap justify-center gap-3 text-sm font-medium text-forest/60">
-              <span className="px-4 py-2 bg-sand rounded-full">Dr. Karl Yousef</span>
-              <span className="px-4 py-2 bg-sand rounded-full">Dr. Diah</span>
-              <span className="px-4 py-2 bg-sand rounded-full">Dr. Steinberg</span>
-              <span className="px-4 py-2 bg-sand rounded-full">Dr. Sheikh</span>
-              <span className="px-4 py-2 bg-sand rounded-full">Charmaine Limpioso, APRN</span>
+            <MobileTeamCarousel />
+
+            {/* Desktop: featured layout */}
+            <div className="hidden lg:grid grid-cols-12 gap-5">
+
+              {/* Featured: Dr. Yousef */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                viewport={{ once: true }}
+                className="col-span-5 bg-forest text-cream rounded-3xl overflow-hidden flex flex-col self-center"
+              >
+                <div className="aspect-[4/3] w-full overflow-hidden bg-forest-light">
+                  <img src={team[0].image} alt={team[0].name} className="w-full h-full object-cover object-top" />
+                </div>
+                <div className="p-8 flex flex-col">
+                  <span className="text-xs font-medium uppercase tracking-widest text-cream/50 mb-3">Founder</span>
+                  <p className="font-serif font-semibold text-cream text-2xl leading-tight mb-1">{team[0].name}</p>
+                  <p className="text-xs font-medium uppercase tracking-widest text-cream/50 mb-4">{team[0].role}</p>
+                  <p className="text-base text-cream/80 leading-relaxed">{team[0].bio}</p>
+                </div>
+              </motion.div>
+
+              {/* Supporting 2x2 grid */}
+              <div className="col-span-7 grid grid-cols-2 gap-5">
+                {team.slice(1).map((member, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: (i + 1) * 0.08 }}
+                    viewport={{ once: true }}
+                    className="bg-cream border border-forest/8 rounded-3xl overflow-hidden"
+                  >
+                    <div className="aspect-square w-full overflow-hidden bg-sand">
+                      <img src={member.image} alt={member.name} className="w-full h-full object-cover object-top" />
+                    </div>
+                    <div className="p-5">
+                      <p className="font-serif font-semibold text-forest text-base leading-tight">{member.name}</p>
+                      <p className="text-xs font-medium uppercase tracking-widest text-forest/50 mt-1 mb-3">{member.role}</p>
+                      <p className="text-sm text-forest/70 leading-relaxed">{member.bio}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+
             </div>
           </div>
         </section>
 
-        {/* FINAL CTA - Zero Friction */}
+        {/* FINAL CTA */}
         <section className="py-24 sm:py-32 bg-forest text-cream text-center px-4">
           <div className="max-w-3xl mx-auto">
             <h2 className="text-5xl sm:text-6xl font-serif mb-8 tracking-tight leading-none">We're accepting new patients.</h2>
@@ -296,16 +484,16 @@ export default function App() {
               Don't wait weeks for an appointment. Text or call us right now to get your child the care they deserve.
             </p>
             <div className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-6">
-              <a 
-                href="tel:+19545550198" 
-                className="w-full sm:w-auto flex justify-center items-center gap-3 bg-cream text-forest px-8 py-4.5 rounded-full hover:bg-sage transition-all text-lg font-medium shadow-xl"
+              <a
+                href="tel:+19543510202"
+                className="w-full sm:w-auto flex justify-center items-center gap-3 bg-cream text-forest px-8 py-4 rounded-full hover:bg-sage transition-all text-lg font-medium shadow-xl"
               >
                 <Phone size={20} className="fill-current" />
-                Call (954) 555-0198
+                Call (954) 351-0202
               </a>
-              <a 
-                href="sms:+19545550198" 
-                className="w-full sm:w-auto flex justify-center items-center gap-3 bg-forest-light text-cream px-8 py-4.5 rounded-full hover:bg-forest-light/80 transition-all text-lg font-medium border border-cream/20"
+              <a
+                href="sms:+19543510202"
+                className="w-full sm:w-auto flex justify-center items-center gap-3 bg-forest-light text-cream px-8 py-4 rounded-full hover:bg-forest-light/80 transition-all text-lg font-medium border border-cream/20"
               >
                 <MessageCircle size={20} />
                 Text Us Now
@@ -313,6 +501,7 @@ export default function App() {
             </div>
           </div>
         </section>
+
       </main>
 
       {/* FOOTER */}
@@ -325,43 +514,40 @@ export default function App() {
                 Building healthy futures, one child at a time. A lifetime of trust starts here.
               </p>
             </div>
-            
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
               <div>
                 <h4 className="font-medium mb-6 uppercase text-xs tracking-widest opacity-60">Contact</h4>
                 <ul className="space-y-4 text-base opacity-80">
-                  <li className="flex items-center gap-3"><Phone size={18}/> (954) 555-0198</li>
-                  <li className="flex items-center gap-3"><MessageCircle size={18}/> Text us anytime</li>
+                  <li className="flex items-center gap-3"><Phone size={18} /> (954) 351-0202</li>
+                  <li className="flex items-center gap-3"><MessageCircle size={18} /> Text us anytime</li>
                 </ul>
               </div>
-
               <div>
                 <h4 className="font-medium mb-6 uppercase text-xs tracking-widest opacity-60">Location</h4>
                 <ul className="space-y-4 text-base opacity-80">
                   <li className="flex items-start gap-3">
                     <MapPin size={18} className="shrink-0 mt-1" />
-                    <span className="leading-relaxed">100 E. Commercial Blvd.<br/>Oakland Park, FL 33334</span>
+                    <span className="leading-relaxed">100 E. Commercial Blvd.<br />Oakland Park, FL 33334</span>
                   </li>
                 </ul>
               </div>
             </div>
           </div>
-          
           <div className="lg:col-span-7 h-64 sm:h-80 lg:h-[400px] rounded-3xl overflow-hidden shadow-inner border border-forest/10">
-            <iframe 
+            <iframe
               title="Total Pediatric Care Location"
-              width="100%" 
-              height="100%" 
-              style={{ border: 0 }} 
-              loading="lazy" 
-              allowFullScreen 
-              referrerPolicy="no-referrer-when-downgrade" 
+              width="100%"
+              height="100%"
+              style={{ border: 0 }}
+              loading="lazy"
+              allowFullScreen
+              referrerPolicy="no-referrer-when-downgrade"
               src="https://maps.google.com/maps?q=Total+Pediatric+Care,+100+E+Commercial+Blvd,+Fort+Lauderdale,+FL+33334&t=&z=15&ie=UTF8&iwloc=&output=embed"
             ></iframe>
           </div>
         </div>
       </footer>
+
     </div>
   );
 }
-

@@ -416,39 +416,16 @@ export default function App() {
 
             <MobileTeamCarousel />
 
-            {/* Desktop: centered cluster layout */}
-            <div className="hidden lg:flex gap-3 items-center">
+            {/* Desktop: featured layout */}
+            <div className="hidden lg:grid grid-cols-12 gap-5">
 
-              {/* Left column */}
-              <div className="flex flex-col gap-3 flex-1">
-                {[team[1], team[3]].map((member, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: i * 0.1 }}
-                    viewport={{ once: true }}
-                    className="bg-cream border border-forest/8 rounded-3xl overflow-hidden"
-                  >
-                    <div className="aspect-square w-full overflow-hidden bg-sand">
-                      <img src={member.image} alt={member.name} className="w-full h-full object-cover object-top" />
-                    </div>
-                    <div className="p-5">
-                      <p className="font-serif font-semibold text-forest text-base leading-tight">{member.name}</p>
-                      <p className="text-xs font-medium uppercase tracking-widest text-forest/50 mt-1 mb-2">{member.role}</p>
-                      <p className="text-sm text-forest/70 leading-relaxed">{member.bio}</p>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-
-              {/* Center: Dr. Yousef */}
+              {/* Featured: Dr. Yousef */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
                 viewport={{ once: true }}
-                className="flex-1 bg-forest text-cream rounded-3xl overflow-hidden"
+                className="col-span-5 bg-forest text-cream rounded-3xl overflow-hidden flex flex-col self-center"
               >
                 <div className="aspect-[4/3] w-full overflow-hidden bg-forest-light">
                   <img src={team[0].image} alt={team[0].name} className="w-full h-full object-cover object-top" />
@@ -461,14 +438,14 @@ export default function App() {
                 </div>
               </motion.div>
 
-              {/* Right column */}
-              <div className="flex flex-col gap-3 flex-1">
-                {[team[2], team[4]].map((member, i) => (
+              {/* Supporting 2x2 grid */}
+              <div className="col-span-7 grid grid-cols-2 gap-5">
+                {team.slice(1).map((member, i) => (
                   <motion.div
                     key={i}
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: i * 0.1 }}
+                    transition={{ duration: 0.5, delay: (i + 1) * 0.08 }}
                     viewport={{ once: true }}
                     className="bg-cream border border-forest/8 rounded-3xl overflow-hidden"
                   >
@@ -477,7 +454,7 @@ export default function App() {
                     </div>
                     <div className="p-5">
                       <p className="font-serif font-semibold text-forest text-base leading-tight">{member.name}</p>
-                      <p className="text-xs font-medium uppercase tracking-widest text-forest/50 mt-1 mb-2">{member.role}</p>
+                      <p className="text-xs font-medium uppercase tracking-widest text-forest/50 mt-1 mb-3">{member.role}</p>
                       <p className="text-sm text-forest/70 leading-relaxed">{member.bio}</p>
                     </div>
                   </motion.div>
